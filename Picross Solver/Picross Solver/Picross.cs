@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,6 +39,8 @@ namespace Picross_Solver
 
         public void initialize()
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             int width = Board.GetLength(0);
             int height = Board.GetLength(1);
 
@@ -57,10 +60,23 @@ namespace Picross_Solver
                 generatePossibilities(col.Rules, height, ref possibilities);
             }
 
+            bool?[,] previousBoard = Board.Clone() as bool?[,];
+
             int counter = 0;
-            while (true)
+            while (counter < 100)
             {
+                //Console.ReadKey();
+
+                bool equal =
+Board.Rank == previousBoard.Rank &&
+Enumerable.Range(0, Board.Rank).All(dimension => Board.GetLength(dimension) == previousBoard.GetLength(dimension)) &&
+Board.Cast<bool?>().SequenceEqual(previousBoard.Cast<bool?>());
+
+                if (equal && counter > 1) break;
+
+                previousBoard = Board.Clone() as bool?[,];
                 printBoard(counter++);
+
                 for (int row = 0; row < height; row++)
                 {
                     // update row's know state from board's know state
@@ -72,9 +88,9 @@ namespace Picross_Solver
                     if (Rows[row].Possibilities.Count == 1)
                     {
                         for (int i = 0; i < width; i++)
-                            Rows[row].Known[i] = Rows[row].Possibilities[0][i] == true;
+                            Board[i, row] = Rows[row].Possibilities[0][i] == true;
 
-                        Rows[row].Possibilities.Clear();
+                        //Rows[row].Possibilities.Clear();
                     }
 
                     // find definate positives
@@ -107,7 +123,7 @@ namespace Picross_Solver
                     foreach (bool[] possibility in possibilities)
                     {
                         bool remove = false;
-                        for (int j = 0; j < height; j++)
+                        for (int j = 0; j < width; j++)
                         {
                             if (Board[j, row] != null && Board[j, row] != possibility[j])
                                 remove = true;
@@ -126,12 +142,12 @@ namespace Picross_Solver
                 }
 
 
-                for (int col = 0; col < height; col++)
+                for (int col = 0; col < width; col++)
                 {
                     // update column's know state from board's know state
                     for (int i = 0; i < height; i++)
-                        if (Board[i, col] != null)
-                            Columns[i].Known[col] = Board[i, col];
+                        if (Board[col, i] != null)
+                            Columns[col].Known[i] = Board[col, i];
 
                     bool?[] columnKnown = Enumerable.Repeat((bool?)null, height).ToArray();
                     for (int i = 0; i < height; i++)
@@ -141,9 +157,9 @@ namespace Picross_Solver
                     if (Columns[col].Possibilities.Count == 1)
                     {
                         for (int i = 0; i < height; i++)
-                            Columns[col].Known[i] = Columns[col].Possibilities[0][i] == true;
+                            Board[col, i] = Columns[col].Possibilities[0][i] == true;
 
-                        Columns[col].Possibilities.Clear();
+                        //Columns[col].Possibilities.Clear();
                     }
 
                     // find definate positives
@@ -191,6 +207,12 @@ namespace Picross_Solver
                 }
 
             }
+            sw.Stop();
+
+            printBoard(--counter);
+            Console.WriteLine(sw.ElapsedMilliseconds);
+
+            Console.ReadKey();
 
         }
 
@@ -202,7 +224,7 @@ namespace Picross_Solver
             {
                 for (int x = 0; x < Board.GetLength(0); x++)
                 {
-                    Console.Write(Board[x, y] == null ? "." : Board[x, y] == true ? "X" : "Y");
+                    Console.Write(Board[x, y] == null ? " " : Board[x, y] == true ? "#" : "/");
                 }
                 Console.WriteLine();
             }
