@@ -44,28 +44,37 @@ namespace Picross_Solver
             int width = Board.GetLength(0);
             int height = Board.GetLength(1);
 
-            foreach (Row row in Rows)
+            Parallel.ForEach(Rows, row => // foreach(Row row in Rows)
             {
                 row.Known = new bool?[width];
 
                 List<bool[]> rowPossibilities = row.Possibilities;
                 generatePossibilities(row.Rules, width, ref rowPossibilities);
             }
+            );
 
-            foreach (Column col in Columns)
+            Parallel.ForEach(Columns, col =>// foreach (Column col in Columns)
             {
                 col.Known = new bool?[height];
 
                 List<bool[]> possibilities = col.Possibilities;
                 generatePossibilities(col.Rules, height, ref possibilities);
             }
+            );
 
             bool?[,] previousBoard = Board.Clone() as bool?[,];
 
             int counter = 0;
+
+            long setupTime = sw.ElapsedMilliseconds;
+            sw.Restart();
+            Console.WriteLine("0");
+
             while (counter < 100)
             {
-                //Console.ReadKey();
+                sw.Stop();
+                Console.ReadKey();
+                sw.Start();
 
                 bool equal =
 Board.Rank == previousBoard.Rank &&
@@ -210,7 +219,8 @@ Board.Cast<bool?>().SequenceEqual(previousBoard.Cast<bool?>());
             sw.Stop();
 
             printBoard(--counter);
-            Console.WriteLine(sw.ElapsedMilliseconds);
+            Console.WriteLine("Setup:\t\t" + setupTime / 1000.000);
+            Console.WriteLine("Execution:\t" + sw.ElapsedMilliseconds / 1000.000);
 
             Console.ReadKey();
 
@@ -224,7 +234,7 @@ Board.Cast<bool?>().SequenceEqual(previousBoard.Cast<bool?>());
             {
                 for (int x = 0; x < Board.GetLength(0); x++)
                 {
-                    Console.Write(Board[x, y] == null ? " " : Board[x, y] == true ? "#" : "/");
+                    Console.Write(Board[x, y] == null ? "." : Board[x, y] == true ? "#" : " ");
                 }
                 Console.WriteLine();
             }
