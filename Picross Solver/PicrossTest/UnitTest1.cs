@@ -12,7 +12,7 @@ namespace PicrossTest
         {
             Picross p = new Picross(10, 10);
 
-            var result = p.Test(true);
+            var result = p.Test(false);
 
             Assert.IsTrue(result);
 
