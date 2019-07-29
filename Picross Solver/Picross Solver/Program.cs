@@ -12,6 +12,7 @@ namespace Picross_Solver
         {
             Picross p = new Picross(30,20);
 
+
             //initialize rows with rules
             p.Rows = new List<Picross.Row>()
             {
