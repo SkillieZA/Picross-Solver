@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Picross_Solver
 {
-    class Picross
+    public class Picross
     {
         private bool?[,] _board;
         private List<Row> _rows;
@@ -35,6 +35,11 @@ namespace Picross_Solver
         public Picross(int width, int height)
         {
             _board = new bool?[width, height];
+        }
+
+        public bool Test(bool test)
+        {
+            return test;
         }
 
         public void initialize()
