@@ -18,5 +18,20 @@ namespace PicrossTest
 
 
         }
+
+        [TestMethod]
+        public void TestMethod2()
+        {
+            Assert.IsTrue(true);
+
+        }
+
+        [TestMethod]
+        public void TestMethod3()
+        {
+            Assert.IsTrue(true);
+
+        }
+
     }
 }
